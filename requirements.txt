@@ -1,0 +1,8 @@
+# Face Recognition Attendance System - Python 3.11+
+# opencv-python : camera + YuNet face detector + SFace face recogniser
+#                 (ONNX models run offline on the CPU - no dlib/CMake needed)
+# Flask         : tiny local web server for the HTML/CSS/JavaScript interface
+opencv-python>=4.9.0.80
+numpy>=1.26
+openpyxl>=3.1.2
+Flask>=3.0

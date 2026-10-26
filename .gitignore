@@ -1,0 +1,12 @@
+venv/
+__pycache__/
+*.pyc
+attendance.xlsx
+data/*
+!data/.gitkeep
+face_data/*
+!face_data/.gitkeep
+exports/*
+!exports/.gitkeep
+logs/*
+!logs/.gitkeep

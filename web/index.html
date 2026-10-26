@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="app-token" content="__APP_TOKEN__">
+  <title>Face Recognition Attendance System</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#/dashboard">
+      <span class="brand-mark" aria-hidden="true">&#9673;</span>
+      <span>Face Attendance</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="#/dashboard" data-nav="dashboard">Dashboard</a>
+      <a href="#/attendance" data-nav="attendance">Attendance</a>
+      <a href="#/register" data-nav="register">Register</a>
+      <a href="#/records" data-nav="records">Records</a>
+      <a href="#/people" data-nav="people">People</a>
+      <a href="#/settings" data-nav="settings">Settings</a>
+    </nav>
+  </header>
+
+  <main id="app">
+    <!-- ================= Dashboard ================= -->
+    <section class="view" id="view-dashboard" hidden>
+      <div class="hero">
+        <h1>Face Recognition Attendance System</h1>
+        <p>Automatic attendance with on-device face recognition. Nothing leaves this computer.</p>
+      </div>
+      <div class="stats">
+        <div class="card stat"><span class="label">Today's Date</span><strong id="stat-date">-</strong></div>
+        <div class="card stat"><span class="label">Current Time</span><strong id="stat-time">-</strong></div>
+        <div class="card stat"><span class="label">Registered People</span><strong id="stat-registered">-</strong></div>
+        <div class="card stat"><span class="label">Present Today</span><strong id="stat-present">-</strong></div>
+      </div>
+      <div class="tiles">
+        <a class="tile tile-success" href="#/attendance"><span class="tile-icon">&#9654;</span>Start Attendance</a>
+        <a class="tile" href="#/register"><span class="tile-icon">&#43;</span>Register Person</a>
+        <a class="tile" href="#/records"><span class="tile-icon">&#9776;</span>Attendance Records</a>
+        <a class="tile" href="#/people"><span class="tile-icon">&#9786;</span>Registered People</a>
+        <a class="tile tile-neutral" href="#/settings"><span class="tile-icon">&#9881;</span>Settings</a>
+        <button class="tile tile-danger" id="btn-exit" type="button"><span class="tile-icon">&#10006;</span>Exit</button>
+      </div>
+    </section>
+
+    <!-- ================= Live attendance ================= -->
+    <section class="view" id="view-attendance" hidden>
+      <div class="view-head">
+        <h2>Live Attendance</h2>
+        <a class="btn btn-secondary" href="#/dashboard">Stop &amp; Return</a>
+      </div>
+      <div class="split">
+        <div class="card video-card">
+          <div class="video-box">
+            <img id="att-feed" alt="Live camera" hidden>
+            <p class="video-placeholder" id="att-placeholder">Starting camera&hellip;</p>
+          </div>
+          <p class="muted small" id="att-counters">&nbsp;</p>
+        </div>
+        <div class="side">
+          <div class="card status-card" id="att-status" data-tone="idle">
+            <span class="label">Status</span>
+            <h3 id="att-banner">Waiting for a face&hellip;</h3>
+            <p id="att-line1"></p><p id="att-line2"></p><p id="att-line3"></p>
+          </div>
+          <div class="card history-card">
+            <span class="label">Recent activity</span>
+            <ul id="att-history" class="history"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Register ================= -->
+    <section class="view" id="view-register" hidden>
+      <div class="view-head">
+        <h2>Register Person</h2>
+        <a class="btn btn-secondary" href="#/dashboard">Back</a>
+      </div>
+      <div class="split">
+        <form class="card form-card" id="reg-form" autocomplete="off" novalidate>
+          <h3>Person Details</h3>
+          <label>Employee / Student ID *<input name="employee_id" maxlength="30" required></label>
+          <label>Full Name *<input name="name" maxlength="80" required></label>
+          <label>Department *<input name="department" maxlength="60" required></label>
+          <label>Email (optional)<input name="email" type="email" maxlength="120"></label>
+          <hr>
+          <span class="label">Face Capture</span>
+          <p class="instruction" id="reg-instruction">Fill in the details, then click Capture Face.</p>
+          <progress id="reg-progress" max="5" value="0"></progress>
+          <p class="muted small" id="reg-progress-text">Samples captured: 0 / 5</p>
+          <div class="btn-col">
+            <button class="btn btn-primary" id="reg-capture" type="button">Capture Face</button>
+            <button class="btn btn-success" id="reg-save" type="button" disabled>Save Person</button>
+            <button class="btn btn-secondary" id="reg-cancel" type="button">Cancel</button>
+          </div>
+        </form>
+        <div class="card video-card">
+          <div class="video-box">
+            <img id="reg-feed" alt="Registration camera" hidden>
+            <p class="video-placeholder" id="reg-placeholder">Camera preview<br><br>Click &ldquo;Capture Face&rdquo; to begin</p>
+          </div>
+          <p class="status-text" id="reg-status">&nbsp;</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Records ================= -->
+    <section class="view" id="view-records" hidden>
+      <div class="view-head">
+        <h2>Attendance Records</h2>
+        <a class="btn btn-secondary" href="#/dashboard">Back</a>
+      </div>
+      <form class="card toolbar" id="rec-filters">
+        <label class="grow">Search (name or Employee ID)<input id="rec-search" placeholder="e.g. Rahul or EMP001"></label>
+        <label>Date (DD-MM-YYYY)<input id="rec-date" placeholder="25-10-2026" maxlength="10"></label>
+        <button class="btn btn-primary" type="submit">Search</button>
+        <button class="btn btn-secondary" type="button" id="rec-today">Today</button>
+        <button class="btn btn-secondary" type="button" id="rec-all">All Records</button>
+        <button class="btn btn-success" type="button" id="rec-export">Export to Excel</button>
+        <button class="btn btn-primary" type="button" id="rec-open">Open Excel</button>
+      </form>
+      <div class="card table-card">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Employee ID</th><th>Name</th><th>Department</th><th>Date</th><th>Time</th><th>Status</th></tr></thead>
+            <tbody id="rec-body"></tbody>
+          </table>
+        </div>
+      </div>
+      <p class="muted small" id="rec-count"></p>
+    </section>
+
+    <!-- ================= People ================= -->
+    <section class="view" id="view-people" hidden>
+      <div class="view-head">
+        <h2>Registered People</h2>
+        <a class="btn btn-secondary" href="#/dashboard">Back</a>
+      </div>
+      <div class="card toolbar">
+        <label class="grow">Search (name, ID or department)<input id="ppl-search"></label>
+        <button class="btn btn-secondary" type="button" id="ppl-clear">Clear</button>
+      </div>
+      <div class="card table-card">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Employee ID</th><th>Name</th><th>Department</th><th>Email</th><th>Registered On</th><th>Face Samples</th><th></th></tr></thead>
+            <tbody id="ppl-body"></tbody>
+          </table>
+        </div>
+      </div>
+      <p class="muted small" id="ppl-count"></p>
+      <p class="muted small">Face data is stored only on this computer as numeric face signatures (never photographs). Deleting a person removes their face data; past attendance records are kept.</p>
+    </section>
+
+    <!-- ================= Settings ================= -->
+    <section class="view" id="view-settings" hidden>
+      <div class="view-head">
+        <h2>Settings</h2>
+        <a class="btn btn-secondary" href="#/dashboard">Back</a>
+      </div>
+      <form class="card form-card wide" id="set-form" novalidate>
+        <label>Camera index
+          <span class="inline"><input type="number" name="camera_index" min="0" max="10" step="1" required>
+          <button class="btn btn-secondary" type="button" id="set-test">Test Camera</button></span>
+          <small>0 = built-in webcam, 1 = first external camera</small></label>
+        <label>Recognition threshold: <output id="set-threshold-out">0.40</output>
+          <input type="range" name="recognition_threshold" min="0.20" max="0.80" step="0.01">
+          <small>Higher = stricter (fewer false matches, more misses). Recommended: 0.40</small></label>
+        <label>Attendance cooldown (seconds)
+          <input type="number" name="attendance_cooldown_seconds" min="10" max="3600" step="10" required>
+          <small>Time before the same person is processed again</small></label>
+        <label>Confirmation frames
+          <input type="number" name="confirm_frames" min="1" max="10" step="1" required>
+          <small>Consecutive frames needed before attendance is marked</small></label>
+        <button class="btn btn-success" type="submit">Save Settings</button>
+      </form>
+      <div class="card form-card wide">
+        <h3>Where is my data stored?</h3>
+        <dl id="set-paths" class="paths"></dl>
+        <p class="muted small">Nothing is uploaded anywhere. Photographs are never saved.</p>
+      </div>
+    </section>
+  </main>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <dialog id="dialog">
+    <form method="dialog">
+      <h3 id="dialog-title"></h3>
+      <p id="dialog-message"></p>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" value="cancel">Cancel</button>
+        <button class="btn btn-primary" value="ok" id="dialog-ok">OK</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
